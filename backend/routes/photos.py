@@ -25,7 +25,7 @@ def make_photo_response(photo):
         "username": photo["username"],
         "description": photo["description"],
         "keywords": photo["keywords"],
-        "image_url": f"http://localhost:5173/uploads/{photo['filename']}",
+        "image_url": f"http://localhost:5000/uploads/{photo['filename']}",
         "created_at": photo["created_at"]
     }
 

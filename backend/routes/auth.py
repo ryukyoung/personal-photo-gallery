@@ -78,9 +78,19 @@ def me():
     if "user_id" not in session:
         return jsonify({"user": None}), 200
 
+    db = get_db()
+    user = db.execute(
+        "SELECT id, username FROM users WHERE id = ?",
+        (session["user_id"],)
+    ).fetchone()
+
+    if user is None:
+        session.clear()
+        return jsonify({"user": None}), 200
+
     return jsonify({
         "user": {
-            "id": session["user_id"],
-            "username": session["username"]
+            "id": user["id"],
+            "username": user["username"]
         }
     }), 200
