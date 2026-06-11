@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import api from "./api/api";
+import { saveUser, removeUser } from "./utils/auth";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -11,6 +14,31 @@ import MessagesPage from "./pages/MessagesPage";
 import SendMessagePage from "./pages/SendMessagePage";
 
 function App() {
+  const [ready, setReady] = useState(false);
+
+  // Ask the server who we actually are, then sync local state to it.
+  // This prevents the UI from starting "logged in" off a stale
+  // localStorage record when the server session is already gone.
+  useEffect(() => {
+    api
+      .get("/api/auth/me")
+      .then((res) => {
+        if (res.data.user) {
+          saveUser(res.data.user);
+        } else {
+          removeUser();
+        }
+      })
+      .catch(() => {
+        removeUser();
+      })
+      .finally(() => setReady(true));
+  }, []);
+
+  if (!ready) {
+    return <div className="container">Loading…</div>;
+  }
+
   return (
     <>
       <Navbar />
